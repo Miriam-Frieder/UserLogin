@@ -4,6 +4,8 @@ import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import UserContext from "./UserContext";
 import SaveIcon from "@mui/icons-material/Save";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+
 const Update = ({ open, close }: { open: boolean; close: Function }) => {
   const { user, userDispatch } = useContext(UserContext);
   const [userData, setUserData] = useState<User>(user);
@@ -14,14 +16,33 @@ const Update = ({ open, close }: { open: boolean; close: Function }) => {
     setUserData({ ...userData, [key]: value });
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit =async (e: FormEvent) => {
     e.preventDefault();
-    userDispatch({
-      type: "UPDATE_USER",
-      data: userData,
-    });
-    setUserData(user);
-    close();
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user`, {
+        method: 'PUT',
+        body: JSON.stringify(userData),
+        headers: {
+          'content-type': 'application/json',
+          'user-id': user.id+''
+        }
+      })
+      if (response.status === 404) { alert('user not found') }
+      else if (!response.ok) { throw new Error(response.status + '') }
+
+      const data=await response.json();
+
+      userDispatch({
+        type: "UPDATE_USER",
+        data: data,
+      });
+      setUserData(user);
+      close();
+    }
+    catch (e) {
+      console.log(e);
+      alert("Something went wrong. Please try again later.");
+    }
   };
 
   return (

@@ -6,51 +6,44 @@ import { emptyUser } from "./UserContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
-
-const Login = ({ open,isRegister, close }: { open: boolean,isRegister:boolean, close: Function }) => {
+const SignUp = ({ open, close }: { open: boolean, close: Function }) => {
   const { userDispatch } = useContext(UserContext);
   const [userData, setUserData] = useState<User>(emptyUser);
-  const uri=isRegister?'api/user/register':'api/user/login'
+
 
   const handleChange = (key: string, value: string) => {
     setUserData({ ...userData, [key]: value });
   };
 
-   const handleSubmit = async (e: FormEvent) => {
-      e.preventDefault();
-      try {
-        const response = await fetch(`${API_BASE_URL}/${uri}`, {
-          method: 'POST',
-          body: JSON.stringify(
-            {
-              email: userData.email,
-              password: userData.password
-            }
-          ),
-          headers: {
-            'content-type': 'application/json',
-          }
-        })
-        if (response.status === 422) { alert('user already sign up') }
-        else if (response.status ===401) { alert('user not found') }
-        else if (!response.ok) { throw new Error(response.status + '') }
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user/register`, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+          'content-type': 'application/json',
+        }
+      })
+      if (response.status === 422) { alert('user already sign up') }
+      else if (!response.ok) { throw new Error(response.status + '') }
+      const data = await response.json()
+      setUserData({ ...userData, id: data.id });
 
-        const data = await response.json()
 
-        userDispatch({
-          type: 'CREATE_USER',
-          data: isRegister?{ ...userData, id: data.userId }:data.user,
-        });
-  
-        setUserData(emptyUser);
-        close();
-      }
-      catch (e) {
-        console.log(e);
-        alert('Something went wrong. Please try again later.');
-      }
-    };
-  
+      userDispatch({
+        type: 'CREATE_USER',
+        data: { ...userData, id: data.id },
+      });
+
+      setUserData(emptyUser);
+      close();
+    }
+    catch (e) {
+      console.log(e);
+      alert('Something went wrong. Please try again later.');
+    }
+  };
 
   return (
     <Modal
@@ -79,8 +72,26 @@ const Login = ({ open,isRegister, close }: { open: boolean,isRegister:boolean, c
         }}
       >
         <Typography variant="h6" component="h1" textAlign="center" id="login-modal-title">
-          {isRegister? 'Sign Up' : 'Login'}
+          Sign Up
         </Typography>
+
+        <TextField
+          id="firstName"
+          label="First Name"
+          variant="outlined"
+          fullWidth
+          value={userData.firstName}
+          onChange={(e) => handleChange(e.target.id, e.target.value)}
+        />
+
+        <TextField
+          id="lastName"
+          label="Last Name"
+          variant="outlined"
+          fullWidth
+          value={userData.lastName}
+          onChange={(e) => handleChange(e.target.id, e.target.value)}
+        />
 
         <TextField
           id="email"
@@ -102,6 +113,24 @@ const Login = ({ open,isRegister, close }: { open: boolean,isRegister:boolean, c
           onChange={(e) => handleChange(e.target.id, e.target.value)}
         />
 
+        <TextField
+          id="phoneNumber"
+          label="Phone Number"
+          variant="outlined"
+          fullWidth
+          value={userData.phoneNumber}
+          onChange={(e) => handleChange(e.target.id, e.target.value)}
+        />
+
+        <TextField
+          id="address"
+          label="Address"
+          variant="outlined"
+          fullWidth
+          value={userData.address}
+          onChange={(e) => handleChange(e.target.id, e.target.value)}
+        />
+
         <Button type="submit" variant="contained" fullWidth>
           Continue
         </Button>
@@ -110,4 +139,4 @@ const Login = ({ open,isRegister, close }: { open: boolean,isRegister:boolean, c
   );
 };
 
-export default Login;
+export default SignUp;

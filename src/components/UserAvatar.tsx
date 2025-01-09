@@ -43,7 +43,7 @@ const UserAvatar = () => {
 
   return (
     <>
-      <Avatar {...stringAvatar(user?.firstName, user?.lastName)} />
+      <Avatar {...stringAvatar(user?.firstName??" ", user?.lastName??" ")} />
       <Typography variant="h6" component="div" sx={{ m: 1 }}>
         {user?.firstName} {user?.lastName}
       </Typography>
