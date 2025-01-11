@@ -114,11 +114,11 @@ const Update = ({ open, close }: { open: boolean; close: Function }) => {
         />
 
         <TextField
-          id="phoneNumber"
+          id="phone"
           label="Phone Number"
           variant="outlined"
           fullWidth
-          value={userData.phoneNumber}
+          value={userData.phone}
           onChange={(e) => handleChange(e.target.id, e.target.value)}
         />
 

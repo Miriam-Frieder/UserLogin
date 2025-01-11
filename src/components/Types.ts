@@ -6,7 +6,7 @@ export type User={
     email:String,
     password?: String,
     address?:String,
-    phoneNumber?:String
+    phone?:String
 }
 
 
